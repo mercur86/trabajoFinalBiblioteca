@@ -1,0 +1,35 @@
+<section class="page">
+  <header class="page__header">
+    <div>
+      <h1 class="page__title">Panel</h1>
+      <p class="page__subtitle">Resumen del sistema de reserva de libros</p>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <p class="loading">Cargando…</p>
+  } @else {
+    <div class="stat-grid">
+      <mat-card appearance="outlined" class="stat-card">
+        <mat-icon class="stat-card__icon">menu_book</mat-icon>
+        <span class="stat-card__value">{{ stats().libros }}</span>
+        <span class="stat-card__label">Libros</span>
+      </mat-card>
+      <mat-card appearance="outlined" class="stat-card">
+        <mat-icon class="stat-card__icon">group</mat-icon>
+        <span class="stat-card__value">{{ stats().clientes }}</span>
+        <span class="stat-card__label">Clientes</span>
+      </mat-card>
+      <mat-card appearance="outlined" class="stat-card">
+        <mat-icon class="stat-card__icon">category</mat-icon>
+        <span class="stat-card__value">{{ stats().categorias }}</span>
+        <span class="stat-card__label">Categorías</span>
+      </mat-card>
+      <mat-card appearance="outlined" class="stat-card">
+        <mat-icon class="stat-card__icon">event_note</mat-icon>
+        <span class="stat-card__value">{{ stats().reservas }}</span>
+        <span class="stat-card__label">Reservas</span>
+      </mat-card>
+    </div>
+  }
+</section>

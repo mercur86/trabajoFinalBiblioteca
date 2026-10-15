@@ -1,0 +1,31 @@
+# Backend Spring Boot
+backend/target/
+*.log
+backend/app.log
+backend/app.err
+
+# Frontend Angular (siguiente paso)
+node_modules/
+dist/
+frontend/.angular/
+
+# Herramientas
+.playwright-mcp/
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.classpath
+.project
+
+# SO / temporales
+Thumbs.db
+.DS_Store
+
+# Secretos / entorno
+*.env
+.env.local

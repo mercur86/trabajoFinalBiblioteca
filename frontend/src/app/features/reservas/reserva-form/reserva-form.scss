@@ -1,0 +1,9 @@
+.fecha-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.fecha-row mat-form-field:first-child {
+  flex: 1 1 260px;
+}

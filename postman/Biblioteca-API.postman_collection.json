@@ -1,0 +1,721 @@
+{
+  "info": {
+    "name": "Biblioteca API",
+    "description": "Coleccion para probar el backend del Sistema de Reserva de Libros.\n\nUso:\n1. Importar esta coleccion en Postman.\n2. Verificar la variable de coleccion baseUrl (por defecto http://localhost:8080/v1).\n3. Levantar el backend (ver README del repositorio).\n4. Ejecutar en orden las carpetas 1 -> 2 -> 3 -> 4. Los POST guardan los ids creados en variables (idCategoria, idLibro1, idLibro2, idCliente, idReserva) para que las siguientes llamadas los reutilicen.\n5. La carpeta 5 contiene casos de error esperados (400/404).\n\nNota: un script a nivel de coleccion genera un runId aleatorio en cada request para respetar los UNIQUE (isbn, cedula, email), por lo que la coleccion se puede ejecutar varias veces sin limpiar la base.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// runId unico por ejecucion: evita choques en columnas UNIQUE (isbn, cedula, email)",
+          "const rid = String(Date.now()).slice(-6) + String(Math.floor(Math.random() * 1000)).padStart(3, '0');",
+          "pm.collectionVariables.set('runId', rid);"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/v1", "type": "string" },
+    { "key": "runId", "value": "", "type": "string" },
+    { "key": "idCategoria", "value": "1", "type": "string" },
+    { "key": "idLibro1", "value": "1", "type": "string" },
+    { "key": "idLibro2", "value": "2", "type": "string" },
+    { "key": "idCliente", "value": "1", "type": "string" },
+    { "key": "idReserva", "value": "1", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "0. Smoke",
+      "item": [
+        {
+          "name": "Listar categorias (health)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/categorias", "host": ["{{baseUrl}}"], "path": ["categorias"] },
+            "description": "Comprueba que el backend responde."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });"]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "1. Categorias",
+      "item": [
+        {
+          "name": "Crear categoria",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Novela\",\n  \"descripcion\": \"Obras de ficcion narrativa\",\n  \"estado\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/categorias", "host": ["{{baseUrl}}"], "path": ["categorias"] },
+            "description": "Crea una categoria y guarda su id en {{idCategoria}}."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "const loc = pm.response.headers.get('Location');",
+                  "pm.test('Devuelve Location', function () { pm.expect(loc).to.be.a('string'); });",
+                  "if (loc) { pm.collectionVariables.set('idCategoria', loc.split('/').pop()); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Listar categorias",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/categorias", "host": ["{{baseUrl}}"], "path": ["categorias"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });"]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Obtener categoria por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categorias/{{idCategoria}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["categorias", "{{idCategoria}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });"]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Actualizar categoria",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Novela contemporanea\",\n  \"descripcion\": \"Obras de ficcion narrativa actual\",\n  \"estado\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categorias/{{idCategoria}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["categorias", "{{idCategoria}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });"]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "HATEOAS categoria",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categorias/hateoas/{{idCategoria}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["categorias", "hateoas", "{{idCategoria}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Libros",
+      "item": [
+        {
+          "name": "Crear libro 1",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Cien anios de soledad\",\n  \"autor\": \"Gabriel Garcia Marquez\",\n  \"isbn\": \"978-{{runId}}\",\n  \"disponible\": true,\n  \"categoria\": { \"idCategoria\": {{idCategoria}} }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/libros", "host": ["{{baseUrl}}"], "path": ["libros"] },
+            "description": "Crea un libro; solo se envia el idCategoria. Guarda {{idLibro1}}."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "const loc = pm.response.headers.get('Location');",
+                  "if (loc) { pm.collectionVariables.set('idLibro1', loc.split('/').pop()); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Crear libro 2",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"La ciudad y los perros\",\n  \"autor\": \"Mario Vargas Llosa\",\n  \"isbn\": \"979-{{runId}}\",\n  \"disponible\": true,\n  \"categoria\": { \"idCategoria\": {{idCategoria}} }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/libros", "host": ["{{baseUrl}}"], "path": ["libros"] },
+            "description": "Segundo libro para la reserva. Guarda {{idLibro2}}."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "const loc = pm.response.headers.get('Location');",
+                  "if (loc) { pm.collectionVariables.set('idLibro2', loc.split('/').pop()); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Listar libros",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/libros", "host": ["{{baseUrl}}"], "path": ["libros"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });"]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Obtener libro por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/libros/{{idLibro1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["libros", "{{idLibro1}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });"]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Actualizar libro",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Cien anios de soledad (ed. conmemorativa)\",\n  \"autor\": \"Gabriel Garcia Marquez\",\n  \"isbn\": \"978-{{runId}}\",\n  \"disponible\": false,\n  \"categoria\": { \"idCategoria\": {{idCategoria}} }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/libros/{{idLibro1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["libros", "{{idLibro1}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });"]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Buscar por titulo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/libros/search/titulo?titulo=soledad",
+              "host": ["{{baseUrl}}"],
+              "path": ["libros", "search", "titulo"],
+              "query": [{ "key": "titulo", "value": "soledad" }]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });"]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Buscar por autor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/libros/search/autor?autor=vargas",
+              "host": ["{{baseUrl}}"],
+              "path": ["libros", "search", "autor"],
+              "query": [{ "key": "autor", "value": "vargas" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar por disponible",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/libros/search/disponible?disponible=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["libros", "search", "disponible"],
+              "query": [{ "key": "disponible", "value": "true" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar (combinado titulo/autor/isbn)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/libros/search?term=soledad",
+              "host": ["{{baseUrl}}"],
+              "path": ["libros", "search"],
+              "query": [{ "key": "term", "value": "soledad" }]
+            },
+            "description": "Buscador combinado que usa el frontend (titulo, autor o isbn)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });"]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Clientes",
+      "item": [
+        {
+          "name": "Crear cliente",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Ana Maria\",\n  \"apellidos\": \"Perez Lopez\",\n  \"cedula\": \"{{runId}}\",\n  \"email\": \"cliente{{runId}}@example.com\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/clientes", "host": ["{{baseUrl}}"], "path": ["clientes"] },
+            "description": "Crea un cliente y guarda {{idCliente}}."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "const loc = pm.response.headers.get('Location');",
+                  "if (loc) { pm.collectionVariables.set('idCliente', loc.split('/').pop()); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Listar clientes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/clientes", "host": ["{{baseUrl}}"], "path": ["clientes"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });"]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Obtener cliente por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/clientes/{{idCliente}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["clientes", "{{idCliente}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });"]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Actualizar cliente",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Ana Maria\",\n  \"apellidos\": \"Perez Lopez de la Cruz\",\n  \"cedula\": \"{{runId}}\",\n  \"email\": \"cliente{{runId}}@example.com\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/clientes/{{idCliente}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["clientes", "{{idCliente}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });"]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Buscar cliente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/clientes/search?term=ana",
+              "host": ["{{baseUrl}}"],
+              "path": ["clientes", "search"],
+              "query": [{ "key": "term", "value": "ana" }]
+            },
+            "description": "Buscador que usa el frontend (nombres, apellidos, cedula o email)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });"]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Reservas",
+      "item": [
+        {
+          "name": "Crear reserva (2 libros)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaReserva\": \"2026-10-05T10:30:00\",\n  \"cliente\": { \"idCliente\": {{idCliente}} },\n  \"detalles\": [\n    { \"libro\": { \"idLibro\": {{idLibro1}} } },\n    { \"libro\": { \"idLibro\": {{idLibro2}} } }\n  ]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/reservas", "host": ["{{baseUrl}}"], "path": ["reservas"] },
+            "description": "Registra una reserva con uno o mas libros en una sola transaccion. Guarda {{idReserva}}."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "const loc = pm.response.headers.get('Location');",
+                  "if (loc) { pm.collectionVariables.set('idReserva', loc.split('/').pop()); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Listar reservas (fecha, cliente, libros)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/reservas", "host": ["{{baseUrl}}"], "path": ["reservas"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const payload = pm.response.json();",
+                  "pm.test('La lista es un arreglo', function () { pm.expect(payload).to.be.an('array'); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Obtener reserva por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reservas/{{idReserva}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["reservas", "{{idReserva}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const payload = pm.response.json();",
+                  "pm.test('Trae cliente y detalles', function () {",
+                  "  pm.expect(payload.cliente).to.be.an('object');",
+                  "  pm.expect(payload.detalles).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Reservas de un cliente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reservas/cliente/{{idCliente}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["reservas", "cliente", "{{idCliente}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });"]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Casos de error (esperados)",
+      "item": [
+        {
+          "name": "Reserva sin libros -> 400",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaReserva\": \"2026-10-05T11:00:00\",\n  \"cliente\": { \"idCliente\": {{idCliente}} },\n  \"detalles\": []\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/reservas", "host": ["{{baseUrl}}"], "path": ["reservas"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 400', function () { pm.response.to.have.status(400); });"]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Libro sin categoria -> 400",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Sin categoria\",\n  \"autor\": \"Autor\",\n  \"isbn\": \"000-{{runId}}\",\n  \"disponible\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/libros", "host": ["{{baseUrl}}"], "path": ["libros"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 400', function () { pm.response.to.have.status(400); });"]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Reserva con libro sin id -> 400",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaReserva\": \"2026-10-05T11:00:00\",\n  \"cliente\": { \"idCliente\": {{idCliente}} },\n  \"detalles\": [ { \"libro\": {} } ]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/reservas", "host": ["{{baseUrl}}"], "path": ["reservas"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 400', function () { pm.response.to.have.status(400); });"]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Categoria con nombre vacio -> 400",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"\",\n  \"descripcion\": \"\",\n  \"estado\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/categorias", "host": ["{{baseUrl}}"], "path": ["categorias"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 400', function () { pm.response.to.have.status(400); });"]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Libro inexistente -> 404",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/libros/999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["libros", "999999"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 404', function () { pm.response.to.have.status(404); });"]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+<section class="page">
+  <header class="page__header">
+    <div>
+      <h1 class="page__title">{{ titulo }}</h1>
+      <p class="page__subtitle">Completa los datos del libro</p>
+    </div>
+    <a mat-stroked-button routerLink="/libros">
+      <mat-icon>arrow_back</mat-icon>
+      Volver
+    </a>
+  </header>
+
+  <form class="form-card" [formGroup]="form" (ngSubmit)="submit()">
+    <mat-form-field appearance="outline">
+      <mat-label>Título</mat-label>
+      <input matInput formControlName="titulo" maxlength="150" />
+      @if (form.controls.titulo.touched && form.controls.titulo.invalid) {
+        <mat-error>El título es obligatorio (máx. 150 caracteres).</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Autor</mat-label>
+      <input matInput formControlName="autor" maxlength="100" />
+      @if (form.controls.autor.touched && form.controls.autor.invalid) {
+        <mat-error>El autor es obligatorio (máx. 100 caracteres).</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>ISBN</mat-label>
+      <input matInput formControlName="isbn" maxlength="20" />
+      @if (form.controls.isbn.touched && form.controls.isbn.invalid) {
+        <mat-error>El ISBN es obligatorio (máx. 20 caracteres).</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Categoría</mat-label>
+      <mat-select formControlName="idCategoria">
+        @for (c of categorias(); track c.idCategoria) {
+          <mat-option [value]="c.idCategoria">{{ c.nombre }}</mat-option>
+        }
+      </mat-select>
+      @if (form.controls.idCategoria.touched && form.controls.idCategoria.invalid) {
+        <mat-error>Selecciona una categoría.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-checkbox formControlName="disponible">Disponible para reservar</mat-checkbox>
+
+    <div class="form-actions">
+      <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
+        {{ saving() ? 'Guardando…' : 'Guardar' }}
+      </button>
+      <a mat-stroked-button routerLink="/libros">Cancelar</a>
+    </div>
+  </form>
+</section>

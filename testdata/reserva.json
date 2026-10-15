@@ -1,0 +1,8 @@
+{
+  "fechaReserva": "2026-10-05T10:30:00",
+  "cliente": { "idCliente": <idCliente> },
+  "detalles": [
+    { "libro": { "idLibro": <idLibro1> } },
+    { "libro": { "idLibro": <idLibro2> } }
+  ]
+}

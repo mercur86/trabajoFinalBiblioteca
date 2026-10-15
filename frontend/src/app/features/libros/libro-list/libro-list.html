@@ -1,0 +1,78 @@
+<section class="page">
+  <header class="page__header">
+    <div>
+      <h1 class="page__title">Libros</h1>
+      <p class="page__subtitle">Catálogo de libros de la biblioteca</p>
+    </div>
+    <a mat-flat-button color="primary" routerLink="/libros/nuevo">
+      <mat-icon>add</mat-icon>
+      Nuevo libro
+    </a>
+  </header>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Filtrar</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Título, autor, ISBN o categoría" />
+    <mat-icon matPrefix>search</mat-icon>
+  </mat-form-field>
+
+  @if (loading()) {
+    <p class="loading">Cargando…</p>
+  } @else {
+    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z2">
+      <ng-container matColumnDef="idLibro">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>#</th>
+        <td mat-cell *matCellDef="let row">{{ row.idLibro }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="titulo">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Título</th>
+        <td mat-cell *matCellDef="let row">{{ row.titulo }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="autor">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Autor</th>
+        <td mat-cell *matCellDef="let row">{{ row.autor }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="isbn">
+        <th mat-header-cell *matHeaderCellDef>ISBN</th>
+        <td mat-cell *matCellDef="let row">{{ row.isbn }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="categoria">
+        <th mat-header-cell *matHeaderCellDef>Categoría</th>
+        <td mat-cell *matCellDef="let row">{{ row.categoria?.nombre ?? '—' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="disponible">
+        <th mat-header-cell *matHeaderCellDef>Estado</th>
+        <td mat-cell *matCellDef="let row">
+          <span class="badge" [class.badge--yes]="row.disponible" [class.badge--no]="!row.disponible">
+            {{ row.disponible ? 'Disponible' : 'No disponible' }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let row">
+          <a mat-icon-button color="primary" [routerLink]="['/libros', row.idLibro, 'editar']" aria-label="Editar">
+            <mat-icon>edit</mat-icon>
+          </a>
+          <button mat-icon-button color="warn" (click)="remove(row)" aria-label="Eliminar">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" [attr.colspan]="displayedColumns.length">Sin libros</td>
+      </tr>
+    </table>
+
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons aria-label="Seleccionar página" />
+  }
+</section>

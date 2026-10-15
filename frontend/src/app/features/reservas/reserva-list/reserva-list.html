@@ -1,0 +1,57 @@
+<section class="page">
+  <header class="page__header">
+    <div>
+      <h1 class="page__title">Reservas</h1>
+      <p class="page__subtitle">Fecha, cliente y libros reservados</p>
+    </div>
+    <a mat-flat-button color="primary" routerLink="/reservas/nueva">
+      <mat-icon>add</mat-icon>
+      Nueva reserva
+    </a>
+  </header>
+
+  <div class="filtro">
+    <app-cliente-picker [value]="filtroCliente()" (valueChange)="cambiarFiltro($event)" />
+    <p class="muted">Sin cliente seleccionado se muestran todas las reservas.</p>
+  </div>
+
+  @if (loading()) {
+    <p class="loading">Cargando…</p>
+  } @else {
+    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z2">
+      <ng-container matColumnDef="idReserva">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>#</th>
+        <td mat-cell *matCellDef="let row">{{ row.idReserva }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="fechaReserva">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
+        <td mat-cell *matCellDef="let row">{{ formatFecha(row.fechaReserva) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="cliente">
+        <th mat-header-cell *matHeaderCellDef>Cliente</th>
+        <td mat-cell *matCellDef="let row">{{ row.cliente.nombres }} {{ row.cliente.apellidos }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="libros">
+        <th mat-header-cell *matHeaderCellDef>Libros reservados</th>
+        <td mat-cell *matCellDef="let row">
+          <mat-chip-set>
+            @for (detalle of row.detalles; track detalle.idDetalle) {
+              <mat-chip>{{ detalle.libro.titulo }}</mat-chip>
+            }
+          </mat-chip-set>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" [attr.colspan]="displayedColumns.length">Sin reservas</td>
+      </tr>
+    </table>
+
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons aria-label="Seleccionar página" />
+  }
+</section>

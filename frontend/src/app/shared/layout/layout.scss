@@ -1,0 +1,32 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
+
+.app-toolbar {
+  position: relative;
+  z-index: 2;
+}
+
+.brand-mark {
+  margin-left: 0.25rem;
+}
+
+.app-title {
+  margin-left: 0.5rem;
+  font: var(--mat-sys-title-large);
+  font-weight: 500;
+}
+
+.app-container {
+  flex: 1 1 auto;
+}
+
+.app-sidenav {
+  width: 240px;
+}
+
+.app-content {
+  padding: 1.5rem;
+}

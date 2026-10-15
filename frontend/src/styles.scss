@@ -1,0 +1,154 @@
+// Tema Angular Material 3 (variables --mat-sys-*)
+@use '@angular/material' as mat;
+
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
+
+body {
+  color-scheme: light;
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  margin: 0;
+  height: 100%;
+}
+
+/* ---------- Helpers propios de la app (el resto lo aporta Material) ---------- */
+.page {
+  max-width: 1200px;
+}
+
+.page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.page__title {
+  margin: 0;
+  font: var(--mat-sys-headline-small);
+}
+
+.page__subtitle {
+  margin: 0.15rem 0 0;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
+
+.page__actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 640px;
+  padding: 1.25rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.loading,
+.muted {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.empty-state__code {
+  font-size: 3.5rem;
+  color: var(--mat-sys-primary);
+}
+
+/* ---------- Badges y chips ---------- */
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font: var(--mat-sys-label-small);
+  font-weight: 600;
+}
+
+.badge--yes {
+  background: var(--mat-sys-tertiary-container);
+  color: var(--mat-sys-on-tertiary-container);
+}
+
+.badge--no {
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+/* ---------- Dashboard ---------- */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1.25rem;
+}
+
+.stat-card__icon {
+  color: var(--mat-sys-primary);
+}
+
+.stat-card__value {
+  font: var(--mat-sys-headline-medium);
+  font-weight: 700;
+  color: var(--mat-sys-primary);
+}
+
+.stat-card__label {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+/* ---------- Snackbar de error ---------- */
+.snack-error {
+  --mdc-snackbar-container-color: var(--mat-sys-error);
+  --mdc-snackbar-supporting-text-color: var(--mat-sys-on-error);
+  --mat-snack-bar-button-color: var(--mat-sys-on-error);
+}

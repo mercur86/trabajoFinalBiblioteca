@@ -1,0 +1,69 @@
+<section class="page">
+  <header class="page__header">
+    <div>
+      <h1 class="page__title">Clientes</h1>
+      <p class="page__subtitle">Personas que reservan libros</p>
+    </div>
+    <a mat-flat-button color="primary" routerLink="/clientes/nuevo">
+      <mat-icon>add</mat-icon>
+      Nuevo cliente
+    </a>
+  </header>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Filtrar</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Nombre, cédula o email" />
+    <mat-icon matPrefix>search</mat-icon>
+  </mat-form-field>
+
+  @if (loading()) {
+    <p class="loading">Cargando…</p>
+  } @else {
+    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z2">
+      <ng-container matColumnDef="idCliente">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>#</th>
+        <td mat-cell *matCellDef="let row">{{ row.idCliente }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="nombres">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombres</th>
+        <td mat-cell *matCellDef="let row">{{ row.nombres }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="apellidos">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Apellidos</th>
+        <td mat-cell *matCellDef="let row">{{ row.apellidos }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="cedula">
+        <th mat-header-cell *matHeaderCellDef>Cédula</th>
+        <td mat-cell *matCellDef="let row">{{ row.cedula }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let row">{{ row.email }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let row">
+          <a mat-icon-button color="primary" [routerLink]="['/clientes', row.idCliente, 'editar']" aria-label="Editar">
+            <mat-icon>edit</mat-icon>
+          </a>
+          <button mat-icon-button color="warn" (click)="remove(row)" aria-label="Eliminar">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" [attr.colspan]="displayedColumns.length">Sin clientes</td>
+      </tr>
+    </table>
+
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons aria-label="Seleccionar página" />
+  }
+</section>

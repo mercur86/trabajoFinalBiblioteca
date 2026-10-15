@@ -1,0 +1,44 @@
+<section class="page">
+  <header class="page__header">
+    <div>
+      <h1 class="page__title">Nueva reserva</h1>
+      <p class="page__subtitle">Busca un cliente y uno o más libros</p>
+    </div>
+    <a mat-stroked-button routerLink="/reservas">
+      <mat-icon>arrow_back</mat-icon>
+      Volver
+    </a>
+  </header>
+
+  <form class="form-card" [formGroup]="form" (ngSubmit)="submit()">
+    <app-cliente-picker [(value)]="cliente" />
+    <app-libro-picker [(value)]="libros" />
+
+    <div class="fecha-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha de reserva</mat-label>
+        <input matInput [matDatepicker]="dp" formControlName="fecha" />
+        <mat-datepicker-toggle matIconSuffix [for]="dp" />
+        <mat-datepicker #dp />
+        @if (form.controls.fecha.touched && form.controls.fecha.invalid) {
+          <mat-error>Indica la fecha de la reserva.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Hora</mat-label>
+        <input matInput type="time" formControlName="hora" />
+        @if (form.controls.hora.touched && form.controls.hora.invalid) {
+          <mat-error>Indica la hora.</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <div class="form-actions">
+      <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
+        {{ saving() ? 'Registrando…' : 'Registrar reserva' }}
+      </button>
+      <a mat-stroked-button routerLink="/reservas">Cancelar</a>
+    </div>
+  </form>
+</section>

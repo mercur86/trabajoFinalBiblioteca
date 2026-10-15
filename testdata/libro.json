@@ -1,0 +1,7 @@
+{
+  "titulo": "Cien anios de soledad",
+  "autor": "Gabriel Garcia Marquez",
+  "isbn": "978-0307474728",
+  "disponible": true,
+  "categoria": { "idCategoria": <idCategoria> }
+}
